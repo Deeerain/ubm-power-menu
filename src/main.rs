@@ -8,7 +8,8 @@ use gtk4::{
     Application, ApplicationWindow, Box, Button, EventControllerKey, glib,
 };
 
-mod cofnig;
+mod config;
+mod utils;
 
 const APP_ID: &str = "com.deerains.dummy-power-menu";
 
@@ -43,7 +44,7 @@ impl CommandSpec {
 fn main() -> ExitCode {
     let config_path = "./config.json";
 
-    let mut config = cofnig::Config::new(config_path);
+    let mut config = config::Config::new(config_path);
 
     match std::fs::exists(config_path) {
         Ok(true) => {
@@ -62,7 +63,7 @@ fn main() -> ExitCode {
     app.run()
 }
 
-fn build_ui(app: &Application, config: &cofnig::Config) {
+fn build_ui(app: &Application, config: &config::Config) {
     let (sender, receiver) = async_channel::unbounded::<PowerCommand>();
     let actions = action_definitions();
 
@@ -113,11 +114,11 @@ fn build_ui(app: &Application, config: &cofnig::Config) {
 }
 
 fn action_definitions() -> Vec<PowerAction> {
-    let exit_spec = if is_hyprland_running() {
+    let exit_spec = if utils::is_hyprland_running() {
         Some(CommandSpec::new("hyprctl", &["dispatch", "exit"]))
-    } else if is_sway_running() {
+    } else if utils::is_sway_running() {
         Some(CommandSpec::new("swaymsg", &["exit"]))
-    } else if is_gnome_running() {
+    } else if utils::is_gnome_running() {
         Some(CommandSpec::new("gnome-session-quit", &["--power-off"]))
     } else {
         Some(CommandSpec::new("loginctl", &["terminate-session", "self"]))
@@ -198,18 +199,4 @@ fn build_buttons(sender: &Sender<PowerCommand>, actions: &[PowerAction]) -> Vec<
     }
 
     result
-}
-
-fn is_hyprland_running() -> bool {
-    std::env::var("HYPRLAND_INSTANCE_SIGNATURE").is_ok()
-}
-
-fn is_sway_running() -> bool {
-    std::env::var("SWAYSOCK").is_ok()
-}
-
-fn is_gnome_running() -> bool {
-    std::env::var("XDG_CURRENT_DESKTOP")
-        .map(|desktop| desktop.to_lowercase().contains("gnome"))
-        .unwrap_or(false)
 }
