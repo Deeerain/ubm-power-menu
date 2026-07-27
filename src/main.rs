@@ -5,7 +5,7 @@ use gtk4::gdk::Key;
 use gtk4::glib::{ExitCode, Propagation};
 use gtk4::prelude::*;
 use gtk4::{
-    Application, ApplicationWindow, Box, Button, EventControllerKey, Orientation, glib,
+    Application, ApplicationWindow, Box, Button, EventControllerKey, glib,
 };
 
 mod cofnig;
