@@ -67,7 +67,7 @@ fn build_ui(app: &Application, config: &config::Config) {
 
     let window = ApplicationWindow::builder()
         .application(app)
-        .title(&config.title)
+        .title(&config.application.title)
         .build();
 
     setup_layer_shell(&window);
@@ -80,14 +80,14 @@ fn build_ui(app: &Application, config: &config::Config) {
             .expect("Failed to set orientation; Orientatio is None"),
         12,
     );
-    box_container.set_margin_top(config.margin_top);
-    box_container.set_margin_bottom(config.margin_bottom);
-    box_container.set_margin_start(config.margin_left);
-    box_container.set_margin_end(config.margin_right);
+    box_container.set_margin_top(config.application.margin_top);
+    box_container.set_margin_bottom(config.application.margin_bottom);
+    box_container.set_margin_start(config.application.margin_left);
+    box_container.set_margin_end(config.application.margin_right);
     box_container.set_halign(gtk4::Align::Center);
     box_container.set_valign(gtk4::Align::Center);
 
-    for btn in build_buttons(&sender, &actions) {
+    for btn in build_buttons(&sender, &actions, config.buttons.width, config.buttons.height) {
         box_container.append(&btn);
     }
 
@@ -189,12 +189,16 @@ fn setup_controller(window: &ApplicationWindow, sender: &Sender<PowerCommand>) {
     window.add_controller(key_controller);
 }
 
-fn build_buttons(sender: &Sender<PowerCommand>, actions: &[PowerAction]) -> Vec<Button> {
+fn build_buttons(sender: &Sender<PowerCommand>, actions: &[PowerAction], button_width: i32, button_height: i32) -> Vec<Button> {
     let mut result = Vec::<Button>::new();
 
     for action in actions {
         let tx = sender.clone();
-        let button = Button::builder().label(action.label).build();
+        let button = Button::builder()
+            .label(action.label)
+            .width_request(button_width)
+            .height_request(button_height)
+            .build();
         let command = action.command;
         button.connect_clicked(move |_| {
             let _ = tx.send_blocking(command);
