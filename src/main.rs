@@ -8,6 +8,8 @@ use gtk4::{
     Application, ApplicationWindow, Box, Button, EventControllerKey, Orientation, glib,
 };
 
+mod cofnig;
+
 const APP_ID: &str = "com.deerains.dummy-power-menu";
 
 #[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
@@ -39,18 +41,34 @@ impl CommandSpec {
 }
 
 fn main() -> ExitCode {
+    let config_path = "./config.json";
+
+    let config = cofnig::Config::new(config_path);
+
+    match std::fs::exists(config_path) {
+        Ok(true) => {
+            config.load();           
+        }
+        Ok(false) => {
+            config.save();
+        }
+        Err(e) => {
+            eprintln!("Faield to check cofnig filename: {e}");
+        }
+    }
+
     let app = Application::builder().application_id(APP_ID).build();
-    app.connect_activate(build_ui);
+    app.connect_activate(move |app| build_ui(app, &config));
     app.run()
 }
 
-fn build_ui(app: &Application) {
+fn build_ui(app: &Application, config: &cofnig::Config) {
     let (sender, receiver) = async_channel::unbounded::<PowerCommand>();
     let actions = action_definitions();
 
     let window = ApplicationWindow::builder()
         .application(app)
-        .title("Power Menu")
+        .title(&config.title)
         .build();
 
     setup_layer_shell(&window);
