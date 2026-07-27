@@ -43,7 +43,7 @@ impl CommandSpec {
 fn main() -> ExitCode {
     let config_path = "./config.json";
 
-    let config = cofnig::Config::new(config_path);
+    let mut config = cofnig::Config::new(config_path);
 
     match std::fs::exists(config_path) {
         Ok(true) => {
@@ -74,11 +74,12 @@ fn build_ui(app: &Application, config: &cofnig::Config) {
     setup_layer_shell(&window);
     setup_controller(&window, &sender);
 
-    let box_container = Box::new(Orientation::Vertical, 12);
-    box_container.set_margin_top(5);
-    box_container.set_margin_bottom(5);
-    box_container.set_margin_start(5);
-    box_container.set_margin_end(5);
+    println!("Orientation {:?}", config.get_orientation());
+    let box_container = Box::new(config.get_orientation().expect("Failed to set orientation; Orientatio is None"), 12);
+    box_container.set_margin_top(config.margin_top);
+    box_container.set_margin_bottom(config.margin_bottom);
+    box_container.set_margin_start(config.margin_left);
+    box_container.set_margin_end(config.margin_right);
     box_container.set_halign(gtk4::Align::Center);
     box_container.set_valign(gtk4::Align::Center);
 
@@ -125,27 +126,27 @@ fn action_definitions() -> Vec<PowerAction> {
     vec![
         PowerAction {
             command: PowerCommand::Shutdown,
-            label: "Shutdown",
+            label: "󰐥",
             spec: Some(CommandSpec::new("systemctl", &["poweroff"])),
         },
         PowerAction {
             command: PowerCommand::Reboot,
-            label: "Reboot",
+            label: "󰑓",
             spec: Some(CommandSpec::new("systemctl", &["reboot"])),
         },
         PowerAction {
             command: PowerCommand::Suspend,
-            label: "Suspend",
+            label: "󰤄",
             spec: Some(CommandSpec::new("systemctl", &["suspend"])),
         },
         PowerAction {
             command: PowerCommand::Exit,
-            label: "Exit session",
+            label: "󰈆",
             spec: exit_spec,
         },
         PowerAction {
             command: PowerCommand::CloseMenu,
-            label: "Close",
+            label: "",
             spec: None,
         },
     ]
