@@ -1,14 +1,16 @@
-name: CI
+name: CI & Release
 
 on:
   pull_request:
     branches:
       - main
       - master
+  push:
+    tags:
+      - 'v*' # Запуск при создании тегов вроде v1.0.0, v0.2.1
   workflow_dispatch:
 
 jobs:
-  # Проверка форматирования кода (можно оставить на быстрой Ubuntu)
   lint:
     runs-on: ubuntu-latest
     steps:
@@ -26,11 +28,13 @@ jobs:
       - name: Run cargo fmt check
         run: cargo fmt --all -- --check
 
-  # Совмещенная сборка, тесты и создание Arch-пакета
   build-and-package:
     runs-on: ubuntu-latest
     container: archlinux:latest
     needs: lint
+    # Предоставляем права на создание релизов и запись файлов
+    permissions:
+      contents: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -39,7 +43,6 @@ jobs:
         run: |
           pacman -Sy --noconfirm --needed base-devel cargo pkgconf gtk4 gtk4-layer-shell git
 
-      # Кеширование работает и внутри контейнеров
       - name: Cache cargo registry and build artifacts
         uses: actions/cache@v4
         with:
@@ -56,7 +59,6 @@ jobs:
 
       - name: Build Arch package
         run: |
-          # Создаем безопасного пользователя, так как makepkg запрещено пускать из-под root
           useradd -m builder
           chown -R builder:builder .
           sudo -u builder makepkg --syncdeps --noconfirm --skippgpcheck
@@ -66,3 +68,13 @@ jobs:
         with:
           name: arch-package
           path: "*.pkg.tar.zst"
+
+      # Этот шаг сработает ТОЛЬКО если сборка запущена из-за создания тега (git tag v1.xx)
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: "*.pkg.tar.zst"
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
