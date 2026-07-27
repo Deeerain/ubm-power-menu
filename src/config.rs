@@ -1,17 +1,17 @@
-use gtk4::{Orientation};
+use gtk4::Orientation;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct ButtonsConfig {
     pub height: i32,
-    pub width: i32
+    pub width: i32,
 }
 
 impl Default for ButtonsConfig {
     fn default() -> Self {
         Self {
             width: 100,
-            height: 100,    
+            height: 100,
         }
     }
 }
@@ -30,13 +30,12 @@ pub struct AppConfig {
 }
 
 impl Default for AppConfig {
-
     fn default() -> Self {
         const MARGINS: i32 = 15;
         Self {
             title: "Power menu".to_string(),
             orientation: "horizontal".to_string(), // "vertical"
-            margin_top:  MARGINS,
+            margin_top: MARGINS,
             margin_bottom: MARGINS,
             margin_left: MARGINS,
             margin_right: MARGINS,
@@ -89,6 +88,6 @@ impl Default for Config {
             filename: "./config.json".to_string(),
             application: AppConfig::default(),
             buttons: ButtonsConfig::default(),
-        }   
+        }
     }
 }
