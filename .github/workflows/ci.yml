@@ -8,6 +8,12 @@ on:
      - 'v*'
   workflow_dispatch:
 
+
+permissions:
+  contents: write
+  packages: write
+  actions: read
+
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -71,6 +77,5 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: "*.pkg.tar.zst"
-          fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
