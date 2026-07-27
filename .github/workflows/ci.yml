@@ -4,10 +4,8 @@ on:
   pull_request:
     branches:
       - main
-      - master
-  push:
     tags:
-      - 'v*' # Запуск при создании тегов вроде v1.0.0, v0.2.1
+     - 'v*'
   workflow_dispatch:
 
 jobs:
@@ -69,9 +67,7 @@ jobs:
           name: arch-package
           path: "*.pkg.tar.zst"
 
-      # Этот шаг сработает ТОЛЬКО если сборка запущена из-за создания тега (git tag v1.xx)
       - name: Create GitHub Release
-        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
           files: "*.pkg.tar.zst"

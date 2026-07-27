@@ -1,8 +1,23 @@
 use gtk4::Orientation;
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Clone, Default)]
-pub struct Config {
+#[derive(Serialize, Deserialize, Clone)]
+pub struct ButtonsConfig {
+    pub height: i32,
+    pub width: i32,
+}
+
+impl Default for ButtonsConfig {
+    fn default() -> Self {
+        Self {
+            width: 100,
+            height: 100,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct AppConfig {
     pub title: String,
 
     // Margin
@@ -12,6 +27,26 @@ pub struct Config {
     pub margin_right: i32,
 
     pub orientation: String,
+}
+
+impl Default for AppConfig {
+    fn default() -> Self {
+        const MARGINS: i32 = 15;
+        Self {
+            title: "Power menu".to_string(),
+            orientation: "horizontal".to_string(), // "vertical"
+            margin_top: MARGINS,
+            margin_bottom: MARGINS,
+            margin_left: MARGINS,
+            margin_right: MARGINS,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct Config {
+    pub application: AppConfig,
+    pub buttons: ButtonsConfig,
 
     #[serde(skip)]
     filename: String,
@@ -27,13 +62,7 @@ impl Config {
     pub fn load(&mut self) {
         if let Ok(config_data) = std::fs::read_to_string(&self.filename) {
             if let Ok(config) = serde_json::from_str::<Config>(&config_data) {
-                self.orientation = config.orientation;
-                self.title = config.filename;
-
-                self.margin_top = config.margin_top;
-                self.margin_bottom = config.margin_bottom;
-                self.margin_left = config.margin_left;
-                self.margin_right = config.margin_right;
+                self.application = config.application;
             }
         }
     }
@@ -44,23 +73,21 @@ impl Config {
         }
     }
 
-    pub fn default() -> Self {
-        Self {
-            orientation: String::from("vertical"),
-            title: String::from("Power Menu"),
-            filename: String::from("./config.json"),
-            margin_top: 5,
-            margin_bottom: 5,
-            margin_left: 5,
-            margin_right: 5,
-        }
-    }
-
     pub fn get_orientation(&self) -> Option<Orientation> {
-        match self.orientation.as_str() {
+        match self.application.orientation.as_str() {
             "vertical" => Some(Orientation::Vertical),
             "horizontal" => Some(Orientation::Horizontal),
             _ => Option::None,
+        }
+    }
+}
+
+impl Default for Config {
+    fn default() -> Self {
+        Self {
+            filename: "./config.json".to_string(),
+            application: AppConfig::default(),
+            buttons: ButtonsConfig::default(),
         }
     }
 }
