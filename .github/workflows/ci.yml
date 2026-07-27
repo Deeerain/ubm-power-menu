@@ -67,9 +67,7 @@ jobs:
           name: arch-package
           path: "*.pkg.tar.zst"
 
-      # Этот шаг сработает ТОЛЬКО если сборка запущена из-за создания тега (git tag v1.xx)
       - name: Create GitHub Release
-        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
           files: "*.pkg.tar.zst"
