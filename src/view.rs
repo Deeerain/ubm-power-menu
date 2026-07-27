@@ -5,12 +5,13 @@ use async_channel::Sender;
 use gtk4::gdk::Key;
 use gtk4::glib::Propagation;
 use gtk4::{
-    Application, ApplicationWindow, Box, CssProvider, gdk::Display, glib, prelude::*,
+    prelude::*,
+    Application, ApplicationWindow, Box, CssProvider, gdk::Display, glib,
     style_context_add_provider_for_display,
 };
 use gtk4::{Button, EventControllerKey};
 
-use crate::actions;
+use crate::actions::{self};
 use crate::config;
 use crate::utils;
 
@@ -68,19 +69,36 @@ pub fn build_ui(app: &Application, config: &config::Config, css_file: &Path) {
     let actions_for_loop = actions;
     glib::MainContext::default().spawn_local(async move {
         while let Ok(command) = receiver.recv().await {
+            println!("Command {:?}", command);
+
             if let Some(action) = actions_for_loop
                 .iter()
                 .find(|entry| entry.command == command)
             {
                 if let Some(spec) = action.spec {
+                    println!("With specs");
+
                     match Command::new(spec.program).args(spec.args).spawn() {
                         Ok(_) => {}
                         Err(err) => {
                             eprintln!("Failed to run {:?}: {err}", action.command);
                         }
                     }
+                } else {
+                    match command {
+                        actions::PowerCommand::FocusNext => { 
+                            window_clone.emit_move_focus(gtk4::DirectionType::TabForward);
+                            continue;
+                        },
+                        actions::PowerCommand::FocusPrev => { 
+                            window_clone.emit_move_focus(gtk4::DirectionType::TabBackward);
+                            continue;
+                        },
+                        _ => {}
+                    }
                 }
             }
+
 
             window_clone.close();
             break;
@@ -131,6 +149,16 @@ fn action_definitions() -> Vec<actions::PowerAction> {
             label: "",
             spec: None,
         },
+        actions::PowerAction {
+            command: actions::PowerCommand::FocusNext,
+            label: "",
+            spec: None,
+        },
+        actions::PowerAction {
+            command: actions::PowerCommand::FocusPrev,
+            label: "",
+            spec: None,
+        },
     ]
 }
 
@@ -151,6 +179,10 @@ fn setup_controller(window: &ApplicationWindow, sender: &Sender<actions::PowerCo
     key_controller.connect_key_pressed(move |_, keyval, _, _| {
         let command = match keyval {
             Key::Escape => Some(actions::PowerCommand::CloseMenu),
+            Key::Left => Some(actions::PowerCommand::FocusPrev),
+            Key::Right => Some(actions::PowerCommand::FocusNext),
+            Key::Up => Some(actions::PowerCommand::FocusPrev),
+            Key::Down => Some(actions::PowerCommand::FocusNext),
             _ => None,
         };
 
@@ -173,6 +205,10 @@ fn build_buttons(
     let mut result = Vec::<Button>::new();
 
     for action in actions {
+        if action.label == "" {
+            continue;
+        }
+
         let tx = sender.clone();
         let button = Button::builder()
             .label(action.label)

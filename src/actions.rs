@@ -4,6 +4,10 @@ pub enum PowerCommand {
     Reboot,
     Suspend,
     Exit,
+    
+    //View
+    FocusNext,
+    FocusPrev,
     CloseMenu,
 }
 
