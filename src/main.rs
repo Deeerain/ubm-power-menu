@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use gtk4::Application;
 use gtk4::glib::ExitCode;
 use gtk4::prelude::*;
@@ -11,6 +13,7 @@ const APP_ID: &str = "com.deerains.dummy-power-menu";
 
 fn main() -> ExitCode {
     let config_path = "./config.json";
+    let css_filename = Path::new("./style.css");
 
     let mut config = config::Config::new(config_path);
 
@@ -27,6 +30,6 @@ fn main() -> ExitCode {
     }
 
     let app = Application::builder().application_id(APP_ID).build();
-    app.connect_activate(move |app| view::build_ui(app, &config));
+    app.connect_activate(move |app| view::build_ui(app, &config, css_filename));
     app.run()
 }

@@ -1,4 +1,5 @@
 use std::process::Command;
+use std::path::Path;
 
 use async_channel::Sender;
 use gtk4::gdk::Key;
@@ -13,14 +14,10 @@ use crate::actions;
 use crate::config;
 use crate::utils;
 
-pub fn build_ui(app: &Application, config: &config::Config) {
+pub fn build_ui(app: &Application, config: &config::Config, css_file: &Path) {
     let css_provider = CssProvider::new();
-    css_provider.load_from_data(
-        "button {
-            font-size: 20pt;
-            font-weight: bold;
-        }",
-    );
+    css_provider.load_from_path(&css_file);
+
 
     if let Some(display) = Display::default() {
         style_context_add_provider_for_display(
@@ -41,7 +38,6 @@ pub fn build_ui(app: &Application, config: &config::Config) {
     setup_layer_shell(&window);
     setup_controller(&window, &sender);
 
-    println!("Orientation {:?}", config.get_orientation());
     let box_container = Box::new(
         config
             .get_orientation()
