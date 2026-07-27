@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Clone, Default)]
 pub struct Config {
     pub title: String,
-    
+
     // Margin
     pub margin_top: i32,
     pub margin_bottom: i32,
@@ -57,11 +57,10 @@ impl Config {
     }
 
     pub fn get_orientation(&self) -> Option<Orientation> {
-
         match self.orientation.as_str() {
             "vertical" => Some(Orientation::Vertical),
             "horizontal" => Some(Orientation::Horizontal),
-            _ => Option::None
+            _ => Option::None,
         }
     }
 }

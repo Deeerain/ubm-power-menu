@@ -4,9 +4,7 @@ use async_channel::Sender;
 use gtk4::gdk::Key;
 use gtk4::glib::{ExitCode, Propagation};
 use gtk4::prelude::*;
-use gtk4::{
-    Application, ApplicationWindow, Box, Button, EventControllerKey, glib,
-};
+use gtk4::{Application, ApplicationWindow, Box, Button, EventControllerKey, glib};
 
 mod config;
 mod utils;
@@ -48,7 +46,7 @@ fn main() -> ExitCode {
 
     match std::fs::exists(config_path) {
         Ok(true) => {
-            config.load();           
+            config.load();
         }
         Ok(false) => {
             config.save();
@@ -76,7 +74,12 @@ fn build_ui(app: &Application, config: &config::Config) {
     setup_controller(&window, &sender);
 
     println!("Orientation {:?}", config.get_orientation());
-    let box_container = Box::new(config.get_orientation().expect("Failed to set orientation; Orientatio is None"), 12);
+    let box_container = Box::new(
+        config
+            .get_orientation()
+            .expect("Failed to set orientation; Orientatio is None"),
+        12,
+    );
     box_container.set_margin_top(config.margin_top);
     box_container.set_margin_bottom(config.margin_bottom);
     box_container.set_margin_start(config.margin_left);
@@ -96,7 +99,10 @@ fn build_ui(app: &Application, config: &config::Config) {
     let actions_for_loop = actions;
     glib::MainContext::default().spawn_local(async move {
         while let Ok(command) = receiver.recv().await {
-            if let Some(action) = actions_for_loop.iter().find(|entry| entry.command == command) {
+            if let Some(action) = actions_for_loop
+                .iter()
+                .find(|entry| entry.command == command)
+            {
                 if let Some(spec) = action.spec {
                     match Command::new(spec.program).args(spec.args).spawn() {
                         Ok(_) => {}
@@ -151,8 +157,6 @@ fn action_definitions() -> Vec<PowerAction> {
             spec: None,
         },
     ]
-
-    
 }
 
 fn setup_layer_shell(window: &ApplicationWindow) {
