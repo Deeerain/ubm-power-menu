@@ -69,14 +69,11 @@ pub fn build_ui(app: &Application, config: &config::Config, css_file: &Path) {
     let actions_for_loop = actions;
     glib::MainContext::default().spawn_local(async move {
         while let Ok(command) = receiver.recv().await {
-            println!("Command {:?}", command);
-
             if let Some(action) = actions_for_loop
                 .iter()
                 .find(|entry| entry.command == command)
             {
                 if let Some(spec) = action.spec {
-                    println!("With specs");
 
                     match Command::new(spec.program).args(spec.args).spawn() {
                         Ok(_) => {}
