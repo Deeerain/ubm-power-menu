@@ -7,7 +7,7 @@ pkgdesc="Simple power menu for Hyprland"
 arch=(x86_64)
 url="https://github.com/deeerain/ubm-power-menu"
 license=(MIT)
-depends=(gtk4 gtk4-layer-shell ttf-nerd-fonts-symbols)
+depends=(gtk4 gtk4-layer-shell)
 makedepends=(cargo rust pkgconf)
 source=("$pkgname::git+https://github.com/deeerain/ubm-power-menu.git#branch=main")
 sha512sums=(SKIP)
