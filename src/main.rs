@@ -4,7 +4,7 @@ use gtk4::Application;
 use gtk4::glib::ExitCode;
 use gtk4::prelude::*;
 
-use log::{info, debug, error};
+use log::{debug, error, info};
 
 mod actions;
 mod config;
@@ -16,7 +16,6 @@ fn main() -> ExitCode {
     env_logger::Builder::from_default_env()
         .filter_level(log::LevelFilter::Debug)
         .init();
-
 
     let config_path = "./config.json";
     let css_filename = Path::new("./style.css");

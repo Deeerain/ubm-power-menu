@@ -1,12 +1,11 @@
-use std::process::Command;
 use std::path::Path;
+use std::process::Command;
 
 use async_channel::Sender;
 use gtk4::gdk::Key;
 use gtk4::glib::Propagation;
 use gtk4::{
-    prelude::*,
-    Application, ApplicationWindow, Box, CssProvider, gdk::Display, glib,
+    Application, ApplicationWindow, Box, CssProvider, gdk::Display, glib, prelude::*,
     style_context_add_provider_for_display,
 };
 use gtk4::{Button, EventControllerKey};
@@ -18,7 +17,6 @@ use crate::utils;
 pub fn build_ui(app: &Application, config: &config::Config, css_file: &Path) {
     let css_provider = CssProvider::new();
     css_provider.load_from_path(&css_file);
-
 
     if let Some(display) = Display::default() {
         style_context_add_provider_for_display(
@@ -74,7 +72,6 @@ pub fn build_ui(app: &Application, config: &config::Config, css_file: &Path) {
                 .find(|entry| entry.command == command)
             {
                 if let Some(spec) = action.spec {
-
                     match Command::new(spec.program).args(spec.args).spawn() {
                         Ok(_) => {}
                         Err(err) => {
@@ -83,19 +80,18 @@ pub fn build_ui(app: &Application, config: &config::Config, css_file: &Path) {
                     }
                 } else {
                     match command {
-                        actions::PowerCommand::FocusNext => { 
+                        actions::PowerCommand::FocusNext => {
                             window_clone.emit_move_focus(gtk4::DirectionType::TabForward);
                             continue;
-                        },
-                        actions::PowerCommand::FocusPrev => { 
+                        }
+                        actions::PowerCommand::FocusPrev => {
                             window_clone.emit_move_focus(gtk4::DirectionType::TabBackward);
                             continue;
-                        },
+                        }
                         _ => {}
                     }
                 }
             }
-
 
             window_clone.close();
             break;
