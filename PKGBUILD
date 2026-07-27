@@ -24,4 +24,5 @@ package() {
   install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
   install -Dm644 README.md "$pkgdir/usr/share/doc/$pkgname/README.md"
   install -Dm644 config.json "$pkgdir/usr/share/$pkgname/config.json"
+  install -Dm644 style.css "$pkgdir/usr/share/$pkgname/style.css"
 }
