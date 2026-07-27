@@ -4,6 +4,8 @@ on:
   push:
     tags:
      - 'v*'
+    branches:
+     - main
   pull_request:
     branches:
       - main
@@ -75,6 +77,7 @@ jobs:
           path: "*.pkg.tar.zst"
 
       - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
           files: "*.pkg.tar.zst"
