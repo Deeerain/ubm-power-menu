@@ -40,7 +40,12 @@ fn main() -> ExitCode {
 
     info!("Config file loaded");
 
+    info!("Init application");
     let app = Application::builder().application_id(APP_ID).build();
+
+    info!("Init ui");
     app.connect_activate(move |app| view::build_ui(app, &config, css_filename));
+
+    info!("Run application");
     app.run()
 }
