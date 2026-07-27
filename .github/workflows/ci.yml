@@ -1,14 +1,11 @@
 name: CI
 
 on:
-  push:
-    branches:
-      - main
-      - master
   pull_request:
     branches:
       - main
       - master
+  workflow_dispatch:
 
 jobs:
   build:
@@ -21,7 +18,7 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y pkg-config libgtk-4-dev libgtk-layer-shell-dev
+          sudo apt-get install -y pkg-config libgtk-4-dev libgtk4-layer-shell-dev
 
       - name: Set up Rust toolchain
         uses: actions-rs/toolchain@v1
@@ -65,7 +62,11 @@ jobs:
 
       - name: Build Arch package
         run: |
-          makepkg --syncdeps --noconfirm --skippgpcheck
+          # В Arch Linux утилиту makepkg нельзя запускать от имени root.
+          # Создаем непривилегированного пользователя для сборки пакета.
+          useradd -m builder
+          chown -R builder:builder .
+          sudo -u builder makepkg --syncdeps --noconfirm --skippgpcheck
 
       - name: Upload package artifact
         uses: actions/upload-artifact@v4
