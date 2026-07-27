@@ -9,7 +9,7 @@ url="https://github.com/deeerain/ubm-power-menu"
 license=(MIT)
 depends=(gtk4 gtk4-layer-shell)
 makedepends=(cargo rust pkgconf)
-source=("$pkgname::git+https://github.com/deeerain/ubm-power-menu.git#branch=main")
+source=("$pkgname::git+https://github.com/deeerain/ubm-power-menu.git#tag=v$pkgver")
 sha512sums=(SKIP)
 
 build() {
