@@ -1,7 +1,7 @@
 # Maintainer: deerain <1deerain1@gmail.com>
 
 pkgname=dummy-power-menu
-pkgver=0.1.0
+pkgver=0.1.6
 pkgrel=1
 pkgdesc="Simple power menu for Hyprland"
 arch=(x86_64)
