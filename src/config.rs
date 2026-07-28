@@ -1,4 +1,4 @@
-use std::{error::Error, io, os::raw, path::PathBuf};
+use std::{path::PathBuf};
 
 use gtk4::Orientation;
 use log::warn;
@@ -50,18 +50,9 @@ impl Default for AppConfig {
 pub struct Config {
     pub application: AppConfig,
     pub buttons: ButtonsConfig,
-
-    #[serde(skip)]
-    filename: String,
 }
 
 impl Config {
-    pub fn new(filename: &str) -> Self {
-        let mut conf = Config::default();
-        conf.filename = String::from(filename);
-        conf
-    }
-
     pub fn get_orientation(&self) -> Option<Orientation> {
         match self.application.orientation.as_str() {
             "vertical" => Some(Orientation::Vertical),
@@ -74,7 +65,6 @@ impl Config {
 impl Default for Config {
     fn default() -> Self {
         Self {
-            filename: "./config.json".to_string(),
             application: AppConfig::default(),
             buttons: ButtonsConfig::default(),
         }
