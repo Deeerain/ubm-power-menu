@@ -1,4 +1,7 @@
+use std::{path::PathBuf};
+
 use gtk4::Orientation;
+use log::warn;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -47,32 +50,9 @@ impl Default for AppConfig {
 pub struct Config {
     pub application: AppConfig,
     pub buttons: ButtonsConfig,
-
-    #[serde(skip)]
-    filename: String,
 }
 
 impl Config {
-    pub fn new(filename: &str) -> Self {
-        let mut conf = Config::default();
-        conf.filename = String::from(filename);
-        conf
-    }
-
-    pub fn load(&mut self) {
-        if let Ok(config_data) = std::fs::read_to_string(&self.filename) {
-            if let Ok(config) = serde_json::from_str::<Config>(&config_data) {
-                self.application = config.application;
-            }
-        }
-    }
-
-    pub fn save(&self) {
-        if let Ok(config_data) = serde_json::to_string_pretty(&self) {
-            let _ = std::fs::write(&self.filename, config_data);
-        }
-    }
-
     pub fn get_orientation(&self) -> Option<Orientation> {
         match self.application.orientation.as_str() {
             "vertical" => Some(Orientation::Vertical),
@@ -85,9 +65,35 @@ impl Config {
 impl Default for Config {
     fn default() -> Self {
         Self {
-            filename: "./config.json".to_string(),
             application: AppConfig::default(),
             buttons: ButtonsConfig::default(),
         }
+    }
+}
+
+pub fn load(path: PathBuf) -> Result<Config, ()> {
+    match std::fs::read_to_string(path) {
+        Ok(raw) => {
+            match serde_json::from_str::<Config>(&raw){
+                Ok(config) => Ok(config),
+                Err(e) => {
+                    warn!("Failed to load config file: {}", e);
+                    Ok(Config::default())
+                },
+            }
+        },
+        Err(_) => Ok(Config::default())
+    }
+}
+
+pub fn save(path: PathBuf, config: &Config) -> Result<(), ()> {
+    match serde_json::to_string_pretty(config) {
+        Ok(json) => {
+            match std::fs::write(path, json) {
+                Ok(_) => Ok(()),
+                Err(_) => Err(()),
+            }
+        },
+        Err(_) => Err(())
     }
 }

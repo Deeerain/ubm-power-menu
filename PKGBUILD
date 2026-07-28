@@ -1,7 +1,7 @@
 # Maintainer: deerain <1deerain1@gmail.com>
 
 pkgname=dummy-power-menu
-pkgver=0.1.0
+pkgver=0.1.6
 pkgrel=1
 pkgdesc="Simple power menu for Hyprland"
 arch=(x86_64)
@@ -9,7 +9,7 @@ url="https://github.com/deeerain/ubm-power-menu"
 license=(MIT)
 depends=(gtk4 gtk4-layer-shell)
 makedepends=(cargo rust pkgconf)
-source=("$pkgname::git+https://github.com/deeerain/ubm-power-menu.git#branch=main")
+source=("$pkgname::git+https://github.com/deeerain/ubm-power-menu.git#tag=v$pkgver")
 sha512sums=(SKIP)
 
 build() {
