@@ -25,16 +25,18 @@ fn main() -> ExitCode {
     let app_config: Config;
 
     match config::load(PathBuf::from(config_path)) {
-        Ok(conf) =>  app_config = conf,
+        Ok(conf) => app_config = conf,
         Err(e) => {
-            warn!("Failded to load config file: {:?}. Using default config file", e);
+            warn!(
+                "Failded to load config file: {:?}. Using default config file",
+                e
+            );
             app_config = Config::default();
             match config::save(PathBuf::from(config_path), &app_config) {
                 Ok(()) => info!("Config file saved"),
-                Err(()) => error!("Failed to save config file"), 
+                Err(()) => error!("Failed to save config file"),
             }
-        },
-        
+        }
     }
 
     info!("Config file loaded");

@@ -1,4 +1,4 @@
-use std::{path::PathBuf};
+use std::path::PathBuf;
 
 use gtk4::Orientation;
 use log::warn;
@@ -73,27 +73,23 @@ impl Default for Config {
 
 pub fn load(path: PathBuf) -> Result<Config, ()> {
     match std::fs::read_to_string(path) {
-        Ok(raw) => {
-            match serde_json::from_str::<Config>(&raw){
-                Ok(config) => Ok(config),
-                Err(e) => {
-                    warn!("Failed to load config file: {}", e);
-                    Ok(Config::default())
-                },
+        Ok(raw) => match serde_json::from_str::<Config>(&raw) {
+            Ok(config) => Ok(config),
+            Err(e) => {
+                warn!("Failed to load config file: {}", e);
+                Ok(Config::default())
             }
         },
-        Err(_) => Ok(Config::default())
+        Err(_) => Ok(Config::default()),
     }
 }
 
 pub fn save(path: PathBuf, config: &Config) -> Result<(), ()> {
     match serde_json::to_string_pretty(config) {
-        Ok(json) => {
-            match std::fs::write(path, json) {
-                Ok(_) => Ok(()),
-                Err(_) => Err(()),
-            }
+        Ok(json) => match std::fs::write(path, json) {
+            Ok(_) => Ok(()),
+            Err(_) => Err(()),
         },
-        Err(_) => Err(())
+        Err(_) => Err(()),
     }
 }
